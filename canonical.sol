@@ -39,8 +39,13 @@ contract MonkeyBusiness is ERC20, Ownable {
     function _update(address from, address to, uint256 amount) internal override {
         if (from != address(0) && to != address(0) && transferFeeBps > 0) {
             uint256 fee = (amount * transferFeeBps) / 10_000;
+            uint256 amountAfterFee = amount - fee;
+            
+            // Transfer amount minus fee to recipient
+            super._update(from, to, amountAfterFee);
+            
+            // Transfer fee to collector
             super._update(from, feeCollector, fee);
-            super._update(from, to, amount - fee);
         } else {
             super._update(from, to, amount);
         }
